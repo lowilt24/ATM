@@ -6,10 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class VentanPrincipal extends JFrame {
-    JPanel panel;
-    JButton retiro;
-    JButton ingreso;
-    JButton consulta;
+    private JPanel panel;
+    private JButton retiro, ingreso, consulta;
+
     public VentanPrincipal(){
         setTitle("Cajero Automático");
         setSize(1000,700);
@@ -18,12 +17,14 @@ public class VentanPrincipal extends JFrame {
         iniciarComponentes();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
     private void iniciarComponentes(){
         crearPanel();
         titulo();
         crearBotones();
         accionarBotones();
     }
+
     private void crearPanel(){
         panel = new JPanel();
         panel.setLayout(null);
@@ -45,10 +46,6 @@ public class VentanPrincipal extends JFrame {
         retiro = new JButton("RETIRAR DINERO");
         retiro.setBounds(385,150,200,100);
         retiro.setOpaque(false);
-        /*retiro.setBorderPainted(true);
-        retiro.setContentAreaFilled(true);
-        retiro.setBackground(Color.cyan);
-        retiro.setBorder(new LineBorder(Color.black, 5));*/
         panel.add(retiro);
 
         // Botón Ingreso

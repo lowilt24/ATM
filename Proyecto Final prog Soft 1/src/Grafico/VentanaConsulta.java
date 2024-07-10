@@ -6,22 +6,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class VentanaConsulta extends JFrame {
-    JPanel panel;
-    JButton volver;
+    private JPanel panel;
+    private JButton volver;
+
     public VentanaConsulta() {
+        configurarVentana();
+        iniciarComponentes();
+    }
+
+    private void configurarVentana(){
         setTitle("Consulta");
         setSize(700,700);
         setResizable(false);
         setLocationRelativeTo(null);
-        iniciarComponentes();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
     private void iniciarComponentes(){
         crearPanel();
         texto();
         crearBotones();
         accionarBotones();
     }
+
     private void crearPanel(){
         panel = new JPanel();
         panel.setLayout(null);

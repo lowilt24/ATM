@@ -6,27 +6,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class VentanaIngreso extends JFrame {
-    JPanel panel;
-    JButton volver;
-    JButton listo;
-    JButton cant5, cant10, cant20, cant50, cant100, cant200;
+    private JPanel panel;
+    private JButton volver, otro;
+    private JButton[] botonesCantidades;
 
     public VentanaIngreso() {
-        setTitle("Ingreso");
+        configurarVentana();
+        iniciarComponentes();
+    }
+
+    public void configurarVentana(){
+        setTitle("Depósito");
         setSize(700,700);
         setResizable(false);
         setLocationRelativeTo(null);
-        iniciarComponentes();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
     private void iniciarComponentes(){
         crearPanel();
-        texto();
-        //crearTextField();
+        crearTexto();
         crearBotonesCant();
-        crearBotones();
+        crearBotonVolver();
         accionarBotones();
     }
+
     private void crearPanel(){
         panel = new JPanel();
         panel.setLayout(null);
@@ -34,65 +38,42 @@ public class VentanaIngreso extends JFrame {
         this.getContentPane().add(panel);
     }
 
-    private void texto(){
+    private void crearTexto(){
         JLabel texto = new JLabel();
-        texto.setText("Ingrese un valor para añadir a su cuenta");
-        texto.setBounds(150, 50, 370, 30);
+        texto.setText("Seleccione el valor a depositar");
+        texto.setBounds(150, 50, 300, 30);
         texto.setFont(new Font("Tahoma", Font.PLAIN, 20));
         panel.add(texto);
     }
 
-    /*private void crearTextField(){
-        JTextField canxRet = new JTextField();
-        canxRet.setBounds(100, 290, 300, 30);
-        canxRet.setFont(new Font("Times", Font.PLAIN, 12));
-        panel.add(canxRet);
-    }*/
-
     private void crearBotonesCant(){
-        //5
-        cant5 = new JButton("5$");
-        cant5.setBounds(20,150,200,100);
-        panel.add(cant5);
+        int[] cantidades = {5, 10, 20, 50, 100, 200};
+        botonesCantidades = new JButton[cantidades.length];
 
-        //10
-        cant10 = new JButton("10$");
-        cant10.setBounds(20,300,200,100);
-        panel.add(cant10);
+        int xInicial = 20;
+        int yInicial = 150;
+        int xGap = 430;
+        int yGap = 150;
 
-        //20
-        cant20 = new JButton("20$");
-        cant20.setBounds(20,450,200,100);
-        panel.add(cant20);
+        for (int i = 0; i < cantidades.length; i++) {
+            botonesCantidades[i] = new JButton(cantidades[i] + "$");
+            botonesCantidades[i].setBounds(xInicial + (i % 2) * xGap, yInicial + (i / 2) * yGap, 200, 100);
+            panel.add(botonesCantidades[i]);
+        }
 
-        //50
-        cant50 = new JButton("50$");
-        cant50.setBounds(450,150,200,100);
-        panel.add(cant50);
-
-        //100
-        cant100 = new JButton("100$");
-        cant100.setBounds(450,300,200,100);
-        panel.add(cant100);
-
-        //200
-        cant200 = new JButton("200$");
-        cant200.setBounds(450,450,200,100);
-        panel.add(cant200);
+        // Otra cantidad
+        otro = new JButton("OTRO");
+        otro.setBounds(230,550,200,100);
+        panel.add(otro);
     }
 
-    private void crearBotones(){
+    private void crearBotonVolver(){
         // Botón "Volver"
         volver = new JButton();
         volver.setBounds(20, 20, 100, 30);
         volver.setText("VOLVER");
         panel.add(volver);
 
-        /*// Botón "Listo"
-        listo = new JButton();
-        listo.setBounds(100, 320, 100, 30);
-        listo.setText("LISTO");
-        panel.add(listo);*/
     }
 
     private void accionarBotones(){
@@ -105,5 +86,24 @@ public class VentanaIngreso extends JFrame {
             }
         };
         volver.addActionListener(accionVolver);
+
+        ActionListener accionOtro = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JTextField otroTextField = new JTextField();
+                otroTextField.setVisible(true);
+                otroTextField.setBounds(260,570, 150, 30);
+                panel.add(otroTextField);
+                otro.hide();
+
+                JLabel text = new JLabel("Ingrese valor a depositar: ");
+                text.setBounds(100, 570, 200, 30);
+                text.setVisible(true);
+                panel.add(text);
+
+            }
+        };
+        otro.addActionListener(accionOtro);
     }
+
 }
