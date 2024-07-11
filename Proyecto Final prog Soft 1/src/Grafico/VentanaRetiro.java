@@ -1,137 +1,149 @@
 package Grafico;
 
-import Grafico.VentanPrincipal;
+import Logica.Cuentas;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class VentanaRetiro extends JFrame{
-    JPanel panel;
-    JButton volver;
-    JButton listo;
-    JButton cant5, cant10, cant20, cant50, cant100, cant200, otro;
+public class VentanaRetiro extends JFrame {
+    private JPanel panel;
+    private JButton volver, otro;
+    private JButton[] botonesCantidades;
+    private JTextField otroTextField;
+    private Cuentas cuentas;
+    private String tipoCuenta;
 
+    public VentanaRetiro(Cuentas cuentas, String tipoCuenta) {
+        configurarVentana();
+        this.cuentas = cuentas;
+        this.tipoCuenta = tipoCuenta;
+        iniciarComponentes();
+    }
 
-    public VentanaRetiro() {
+    public void configurarVentana() {
         setTitle("Retiro");
-        setSize(700,700);
+        setSize(700, 700);
         setResizable(false);
         setLocationRelativeTo(null);
-        iniciarComponentes();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-    private void iniciarComponentes(){
+
+    private void iniciarComponentes() {
         crearPanel();
-        texto();
-        //crearTextField();
+        crearTexto();
         crearBotonesCant();
-        crearBotones();
-        accionarBotones();
+        crearBotonVolver();
     }
-    private void crearPanel(){
+
+    private void crearPanel() {
         panel = new JPanel();
         panel.setLayout(null);
         panel.setBackground(Color.GRAY);
         this.getContentPane().add(panel);
     }
 
-    private void texto(){
-        JLabel texto = new JLabel();
-        texto.setText("Ingrese un valor para retirar");
-        texto.setBounds(150, 50, 300, 30);
-        texto.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    private void crearTexto() {
+        JLabel texto = new JLabel("Seleccione el valor a retirar");
+        texto.setBounds(200, 60, 300, 30);
+        texto.setFont(new Font("Tahoma", Font.BOLD, 20));
         panel.add(texto);
     }
 
-    /*private void crearTextField(){
-        JTextField canxRet = new JTextField();
-        canxRet.setBounds(100, 290, 300, 30);
-        canxRet.setFont(new Font("Times", Font.PLAIN, 12));
-        panel.add(canxRet);
-    }*/
+    private void crearBotonesCant() {
+        int[] cantidades = {5, 10, 20, 50, 100, 200};
+        botonesCantidades = new JButton[cantidades.length];
 
-    private void crearBotonesCant(){
-        //5
-        cant5 = new JButton("5$");
-        cant5.setBounds(20,150,200,100);
-        panel.add(cant5);
+        int xInicial = 20;
+        int yInicial = 150;
+        int xGap = 430;
+        int yGap = 150;
 
-        //10
-        cant10 = new JButton("10$");
-        cant10.setBounds(20,300,200,100);
-        panel.add(cant10);
-
-        //20
-        cant20 = new JButton("20$");
-        cant20.setBounds(20,450,200,100);
-        panel.add(cant20);
-
-        //50
-        cant50 = new JButton("50$");
-        cant50.setBounds(450,150,200,100);
-        panel.add(cant50);
-
-        //100
-        cant100 = new JButton("100$");
-        cant100.setBounds(450,300,200,100);
-        panel.add(cant100);
-
-        //200
-        cant200 = new JButton("200$");
-        cant200.setBounds(450,450,200,100);
-        panel.add(cant200);
+        for (int i = 0; i < cantidades.length; i++) {
+            botonesCantidades[i] = new JButton(cantidades[i] + "$");
+            botonesCantidades[i].setBounds(xInicial + (i % 2) * xGap, yInicial + (i / 2) * yGap, 200, 100);
+            panel.add(botonesCantidades[i]);
+            botonesCantidades[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int monto = Integer.parseInt(e.getActionCommand().replace("$", ""));
+                    int confirmacion = JOptionPane.showConfirmDialog(null,
+                            "¿Está seguro que desea retirar $" + monto + " de su cuenta?",
+                            "Confirmación de retiro",
+                            JOptionPane.YES_NO_OPTION);
+                    if (confirmacion == JOptionPane.YES_OPTION) {
+                        try {
+                            cuentas.retirar(tipoCuenta, monto);
+                            JOptionPane.showMessageDialog(null, "Retiro exitoso de $" + monto);
+                        } catch (Cuentas.SaldoInsuficienteException | Cuentas.MultiploCincoException | Cuentas.MenorACincoException | Cuentas.MaxRetiroIngresoException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            });
+        }
 
         // Otra cantidad
         otro = new JButton("OTRO");
         otro.setBounds(230,550,200,100);
         panel.add(otro);
-    }
 
-    private void crearBotones(){
-        // Botón "Volver"
-        volver = new JButton();
-        volver.setBounds(20, 20, 100, 30);
-        volver.setText("VOLVER");
-        panel.add(volver);
-
-        // Botón "Listo"
-        listo = new JButton();
-        listo.setBounds(100, 320, 100, 30);
-        listo.setText("LISTO");
-        panel.add(listo);
-    }
-
-    private void accionarBotones(){
-        ActionListener accionVolver = new ActionListener() {
+        otro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VentanPrincipal ventanPrincipal = new VentanPrincipal();
-                ventanPrincipal.setVisible(true);
-                dispose();
-            }
-        };
-        volver.addActionListener(accionVolver);
-
-        ActionListener accionOtro = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField otroTextField = new JTextField();
-                otroTextField.setVisible(true);
-                //otroTextField.setText("Ingrese un valor para retirar");
+                otroTextField = new JTextField();
                 otroTextField.setBounds(260,570, 150, 30);
                 panel.add(otroTextField);
                 otro.hide();
 
-                JLabel text = new JLabel("INgrese valor a retirar: ");
+                JLabel text = new JLabel("Ingrese valor a retirar: ");
                 text.setBounds(100, 570, 200, 30);
-                text.setVisible(true);
                 panel.add(text);
 
+                JButton confirmar = new JButton("Confirmar");
+                confirmar.setBounds(260, 620, 150, 30);
+                panel.add(confirmar);
+
+                confirmar.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            int monto = Integer.parseInt(otroTextField.getText());
+                            int confirmacion = JOptionPane.showConfirmDialog(null,
+                                    "¿Está seguro que desea retirar $" + monto + " de su cuenta?",
+                                    "Confirmación de retiro",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (confirmacion == JOptionPane.YES_OPTION) {
+                                cuentas.retirar(tipoCuenta, monto);
+                                JOptionPane.showMessageDialog(null, "Retiro exitoso de $" + monto);
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(null, "Ingrese un monto válido", "Error", JOptionPane.ERROR_MESSAGE);
+                        } catch (Cuentas.SaldoInsuficienteException | Cuentas.MultiploCincoException | Cuentas.MenorACincoException | Cuentas.MaxRetiroIngresoException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+
+                panel.revalidate();
+                panel.repaint();
             }
-        };
-        otro.addActionListener(accionOtro);
+        });
+    }
+
+    private void crearBotonVolver() {
+        volver = new JButton("VOLVER");
+        volver.setBounds(20, 20, 100, 30);
+        panel.add(volver);
+
+        volver.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                VentanPrincipal ventanaPrincipal = new VentanPrincipal(cuentas, tipoCuenta);
+                ventanaPrincipal.setVisible(true);
+                dispose();
+            }
+        });
     }
 }
-
