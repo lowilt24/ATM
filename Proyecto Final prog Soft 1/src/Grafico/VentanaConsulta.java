@@ -1,5 +1,7 @@
 package Grafico;
 
+import Logica.Cajero;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,9 +10,13 @@ import java.awt.event.ActionListener;
 public class VentanaConsulta extends JFrame {
     private JPanel panel;
     private JButton volver;
+    private Cajero cajero;
+    private int pin;
 
-    public VentanaConsulta() {
+    public VentanaConsulta(int pin) {
         configurarVentana();
+        this.pin = pin;
+        cajero = new Cajero();
         iniciarComponentes();
     }
 
@@ -38,7 +44,7 @@ public class VentanaConsulta extends JFrame {
 
     private void texto(){
         JLabel texto = new JLabel();
-        texto.setText("SU BALANCE TOTAL ES DE: ");
+        texto.setText("SU BALANCE TOTAL ES DE: $" + cajero.consultarSaldo());
         texto.setBounds(100, 300, 300, 30);
         texto.setFont(new Font("Tahoma", Font.PLAIN, 20));
         panel.add(texto);
@@ -63,3 +69,4 @@ public class VentanaConsulta extends JFrame {
         volver.addActionListener(accionVolver);
     }
 }
+

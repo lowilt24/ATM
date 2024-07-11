@@ -1,5 +1,7 @@
 package Grafico;
 
+import Logica.Cajero;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,9 +11,14 @@ public class VentanaIngreso extends JFrame {
     private JPanel panel;
     private JButton volver, otro;
     private JButton[] botonesCantidades;
+    private JTextField otroTextField;
+    private Cajero cajero;
+    private int pin;
 
-    public VentanaIngreso() {
+    public VentanaIngreso(int pin) {
         configurarVentana();
+        this.pin = pin;
+        cajero = new Cajero();
         iniciarComponentes();
     }
 
@@ -59,12 +66,75 @@ public class VentanaIngreso extends JFrame {
             botonesCantidades[i] = new JButton(cantidades[i] + "$");
             botonesCantidades[i].setBounds(xInicial + (i % 2) * xGap, yInicial + (i / 2) * yGap, 200, 100);
             panel.add(botonesCantidades[i]);
+            botonesCantidades[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int monto = Integer.parseInt(e.getActionCommand().replace("$", ""));
+                    int confirmacion = JOptionPane.showConfirmDialog(null,
+                            "¿Está seguro que desea depositar $" + monto + " en su cuenta?",
+                            "Confirmación de depósito",
+                            JOptionPane.YES_NO_OPTION);
+                    if (confirmacion == JOptionPane.YES_OPTION) {
+                        try {
+                            cajero.ingresar(monto);
+                            JOptionPane.showMessageDialog(null, "Depósito exitoso de $" + monto);
+                            VentanPrincipal ventanPrincipal = new VentanPrincipal();
+                            ventanPrincipal.setVisible(true);
+                            dispose();
+                        } catch (Cajero.MultiploCincoException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            });
         }
 
         // Otra cantidad
         otro = new JButton("OTRO");
         otro.setBounds(230,550,200,100);
         panel.add(otro);
+
+        otro.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                otroTextField = new JTextField();
+                otroTextField.setBounds(260,570, 150, 30);
+                panel.add(otroTextField);
+                otro.hide();
+
+                JLabel text = new JLabel("Ingrese valor a depositar: ");
+                text.setBounds(100, 570, 200, 30);
+                panel.add(text);
+
+                JButton confirmar = new JButton("Confirmar");
+                confirmar.setBounds(260, 620, 150, 30);
+                panel.add(confirmar);
+
+                confirmar.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int monto = Integer.parseInt(otroTextField.getText());
+                        int confirmacion = JOptionPane.showConfirmDialog(null,
+                                "¿Está seguro que desea depositar $" + monto + " en su cuenta?",
+                                "Confirmación de depósito",
+                                JOptionPane.YES_NO_OPTION);
+                        if (confirmacion == JOptionPane.YES_OPTION) {
+                            try {
+                                cajero.ingresar(monto);
+                                JOptionPane.showMessageDialog(null, "Depósito exitoso de $" + monto);
+                                VentanPrincipal ventanPrincipal = new VentanPrincipal();
+                                ventanPrincipal.setVisible(true);
+                                dispose();
+                            } catch (NumberFormatException ex) {
+                                JOptionPane.showMessageDialog(null, "Ingrese un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+                            } catch (Cajero.MultiploCincoException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void crearBotonVolver(){
@@ -86,24 +156,5 @@ public class VentanaIngreso extends JFrame {
             }
         };
         volver.addActionListener(accionVolver);
-
-        ActionListener accionOtro = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField otroTextField = new JTextField();
-                otroTextField.setVisible(true);
-                otroTextField.setBounds(260,570, 150, 30);
-                panel.add(otroTextField);
-                otro.hide();
-
-                JLabel text = new JLabel("Ingrese valor a depositar: ");
-                text.setBounds(100, 570, 200, 30);
-                text.setVisible(true);
-                panel.add(text);
-
-            }
-        };
-        otro.addActionListener(accionOtro);
     }
-
 }
