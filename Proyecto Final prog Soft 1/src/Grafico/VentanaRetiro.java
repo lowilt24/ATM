@@ -1,6 +1,6 @@
 package Grafico;
 
-import Logica.Cajero;
+import Logica.Cuentas;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +12,13 @@ public class VentanaRetiro extends JFrame {
     private JButton volver, otro;
     private JButton[] botonesCantidades;
     private JTextField otroTextField;
-    private Cajero cajero;
+    private Cuentas cuentas;
     private int pin;
 
-    public VentanaRetiro(int pin) {
+    public VentanaRetiro(int pin, Cuentas cuentas) {
         configurarVentana();
         this.pin = pin;
-        cajero = new Cajero();
+        this.cuentas = cuentas;
         iniciarComponentes();
     }
 
@@ -75,15 +75,14 @@ public class VentanaRetiro extends JFrame {
                             "Confirmación de retiro",
                             JOptionPane.YES_NO_OPTION);
                     if (confirmacion == JOptionPane.YES_OPTION) {
-                        boolean retiroExitoso = cajero.retirar(monto);
-                        if (retiroExitoso) {
+                        if (cuentas.retirar(monto, pin)) {
                             JOptionPane.showMessageDialog(null, "Retiro exitoso de $" + monto);
+                            VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
+                            ventanPrincipal.setVisible(true);
+                            dispose();
                         } else {
-                            JOptionPane.showMessageDialog(null, "Fondos insuficientes.", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Fondos insuficientes", "Error", JOptionPane.ERROR_MESSAGE);
                         }
-                        VentanPrincipal ventanPrincipal = new VentanPrincipal();
-                        ventanPrincipal.setVisible(true);
-                        dispose();
                     }
                 }
             });
@@ -119,15 +118,14 @@ public class VentanaRetiro extends JFrame {
                                 "Confirmación de retiro",
                                 JOptionPane.YES_NO_OPTION);
                         if (confirmacion == JOptionPane.YES_OPTION) {
-                            boolean retiroExitoso = cajero.retirar(monto);
-                            if (retiroExitoso) {
+                            if (cuentas.retirar(monto, pin)) {
                                 JOptionPane.showMessageDialog(null, "Retiro exitoso de $" + monto);
+                                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
+                                ventanPrincipal.setVisible(true);
+                                dispose();
                             } else {
-                                JOptionPane.showMessageDialog(null, "Fondos insuficientes.", "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null, "Fondos insuficientes", "Error", JOptionPane.ERROR_MESSAGE);
                             }
-                            VentanPrincipal ventanPrincipal = new VentanPrincipal();
-                            ventanPrincipal.setVisible(true);
-                            dispose();
                         }
                     }
                 });
@@ -141,14 +139,13 @@ public class VentanaRetiro extends JFrame {
         volver.setBounds(20, 20, 100, 30);
         volver.setText("VOLVER");
         panel.add(volver);
-
     }
 
     private void accionarBotones(){
         ActionListener accionVolver = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VentanPrincipal ventanPrincipal = new VentanPrincipal();
+                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
                 ventanPrincipal.setVisible(true);
                 dispose();
             }

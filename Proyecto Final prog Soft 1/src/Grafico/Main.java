@@ -1,12 +1,11 @@
 package Grafico;
 
-import Logica.Cajero;
+import Logica.Cuentas;
 
 public class Main {
     public static void main(String[] args) {
-        Cajero cajero = new Cajero();
-
-        VentanPrincipal ventana1 = new VentanPrincipal();
-        ventana1.setVisible(true);
+        Cuentas cuentas = new Cuentas();
+        VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
+        ventanPrincipal.setVisible(true);
     }
 }

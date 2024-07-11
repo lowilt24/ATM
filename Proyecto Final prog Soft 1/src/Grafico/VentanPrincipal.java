@@ -1,5 +1,7 @@
 package Grafico;
 
+import Logica.Cuentas;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,29 +9,25 @@ import java.awt.event.ActionListener;
 
 public class VentanPrincipal extends JFrame {
     private JPanel panel;
-    private JButton retiro, ingreso, consulta;
-    private JComboBox<String> tipoCuenta;
-    private int pinAhorro = 2024; // PIN para cuenta de ahorro
-    private int pinCorriente = 1123; // PIN para cuenta corriente
+    private JButton ingreso, retiro, consulta;
+    private Cuentas cuentas;
 
-    public VentanPrincipal(){
+    public VentanPrincipal(Cuentas cuentas) {
         configurarVentana();
-
+        this.cuentas = cuentas;
         iniciarComponentes();
     }
 
     public void configurarVentana(){
         setTitle("Cajero Automático");
-        setSize(1000,700);
-        setLocationRelativeTo(null);
+        setSize(400,400);
         setResizable(false);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private void iniciarComponentes(){
         crearPanel();
-        titulo();
-        seleccionTipoCuenta();
         crearBotones();
         accionarBotones();
     }
@@ -41,113 +39,70 @@ public class VentanPrincipal extends JFrame {
         this.getContentPane().add(panel);
     }
 
-    private void titulo(){
-        JLabel titulo = new JLabel();
-        titulo.setText("Cajero");
-        titulo.setBounds(400,20,200,100);
-        titulo.setFont(new Font("IMPACT",Font.BOLD,60));
-        panel.add(titulo);
-    }
-
-    private void seleccionTipoCuenta() {
-        JLabel labelTipoCuenta = new JLabel("Seleccione el tipo de cuenta:");
-        labelTipoCuenta.setBounds(360, 120, 200, 30);
-        panel.add(labelTipoCuenta);
-
-        String[] tipos = {"Ahorro", "Corriente"};
-        tipoCuenta = new JComboBox<>(tipos);
-        tipoCuenta.setBounds(380, 160, 150, 30);
-        panel.add(tipoCuenta);
-    }
-
     private void crearBotones(){
-        // Botón Retiro
-        retiro = new JButton("RETIRAR DINERO");
-        retiro.setBounds(385,250,200,100);
-        retiro.setOpaque(false);
-        panel.add(retiro);
-
-        // Botón Ingreso
-        ingreso = new JButton("DEPOSITAR DINERO");
-        ingreso.setBounds(385,400,200,100);
+        ingreso = new JButton("Ingresar Dinero");
+        ingreso.setBounds(100, 50, 200, 50);
         panel.add(ingreso);
 
-        // Botón Consulta
-        consulta = new JButton("CONSULTAR SALDO");
-        consulta.setBounds(385,550,200,100);
+        retiro = new JButton("Retirar Dinero");
+        retiro.setBounds(100, 150, 200, 50);
+        panel.add(retiro);
+
+        consulta = new JButton("Consultar Saldo");
+        consulta.setBounds(100, 250, 200, 50);
         panel.add(consulta);
     }
 
     private void accionarBotones(){
-
-        //Botón Retiro
-        ActionListener accionRetiro = new ActionListener(){
+        ingreso.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int pin = solicitarPIN();
-                if (pin != -1) {
-                    VentanaRetiro ventanaRetiro = new VentanaRetiro(pin);
-                    ventanaRetiro.setVisible(true);
-                    dispose();
-                }
-            }
-        };
-        retiro.addActionListener(accionRetiro);
-
-        //Botón Ingreso
-        ActionListener accionIngreso = new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int pin = solicitarPIN();
-                if (pin != -1) {
-                    VentanaIngreso ventanaIngreso = new VentanaIngreso(pin);
+                String pinString = JOptionPane.showInputDialog("Ingrese el PIN:");
+                try {
+                    int pin = Integer.parseInt(pinString);
+                    VentanaIngreso ventanaIngreso = new VentanaIngreso(pin, cuentas);
                     ventanaIngreso.setVisible(true);
                     dispose();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Ingrese un PIN válido", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        };
-        ingreso.addActionListener(accionIngreso);
+        });
 
-        // Botón consulta
-        ActionListener accionConsultar = new ActionListener(){
+        retiro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int pin = solicitarPIN();
-                if (pin != -1) {
-                    VentanaConsulta ventanaConsulta = new VentanaConsulta(pin);
-                    ventanaConsulta.setVisible(true);
+                String pinString = JOptionPane.showInputDialog("Ingrese el PIN:");
+                try {
+                    int pin = Integer.parseInt(pinString);
+                    VentanaRetiro ventanaRetiro = new VentanaRetiro(pin, cuentas);
+                    ventanaRetiro.setVisible(true);
                     dispose();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Ingrese un PIN válido", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        };
-        consulta.addActionListener(accionConsultar);
-    }
+        });
 
-    private int solicitarPIN() {
-        String tipo = (String) tipoCuenta.getSelectedItem();
-        int pin;
-        if (tipo.equals("Ahorro")) {
-            pin = pinAhorro;
-        } else {
-            pin = pinCorriente;
-        }
-        String inputPIN = JOptionPane.showInputDialog(null, "Ingrese su PIN de 4 dígitos:");
-        try {
-            int input = Integer.parseInt(inputPIN);
-            if (input == pin) {
-                return pin;
-            } else {
-                JOptionPane.showMessageDialog(null, "PIN incorrecto, intente nuevamente.", "Error", JOptionPane.ERROR_MESSAGE);
-                return -1;
+        consulta.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String pinString = JOptionPane.showInputDialog("Ingrese el PIN:");
+                try {
+                    int pin = Integer.parseInt(pinString);
+                    VentanaConsulta ventanaConsulta = new VentanaConsulta(pin, cuentas);
+                    ventanaConsulta.setVisible(true);
+                    dispose();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Ingrese un PIN válido", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Ingrese un PIN válido (solo números).", "Error", JOptionPane.ERROR_MESSAGE);
-            return -1;
-        }
+        });
     }
 
     public static void main(String[] args) {
-        VentanPrincipal ventana1 = new VentanPrincipal();
-        ventana1.setVisible(true);
+        Cuentas cuentas = new Cuentas();
+        VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
+        ventanPrincipal.setVisible(true);
     }
 }

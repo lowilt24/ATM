@@ -1,6 +1,6 @@
 package Grafico;
 
-import Logica.Cajero;
+import Logica.Cuentas;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +12,13 @@ public class VentanaIngreso extends JFrame {
     private JButton volver, otro;
     private JButton[] botonesCantidades;
     private JTextField otroTextField;
-    private Cajero cajero;
+    private Cuentas cuentas;
     private int pin;
 
-    public VentanaIngreso(int pin) {
+    public VentanaIngreso(int pin, Cuentas cuentas) {
         configurarVentana();
         this.pin = pin;
-        cajero = new Cajero();
+        this.cuentas = cuentas;
         iniciarComponentes();
     }
 
@@ -76,12 +76,12 @@ public class VentanaIngreso extends JFrame {
                             JOptionPane.YES_NO_OPTION);
                     if (confirmacion == JOptionPane.YES_OPTION) {
                         try {
-                            cajero.ingresar(monto);
+                            cuentas.ingresar(monto, pin);
                             JOptionPane.showMessageDialog(null, "Depósito exitoso de $" + monto);
-                            VentanPrincipal ventanPrincipal = new VentanPrincipal();
+                            VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
                             ventanPrincipal.setVisible(true);
                             dispose();
-                        } catch (Cajero.MultiploCincoException ex) {
+                        } catch (Cuentas.MultiploCincoException ex) {
                             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         }
                     }
@@ -120,14 +120,14 @@ public class VentanaIngreso extends JFrame {
                                 JOptionPane.YES_NO_OPTION);
                         if (confirmacion == JOptionPane.YES_OPTION) {
                             try {
-                                cajero.ingresar(monto);
+                                cuentas.ingresar(monto, pin);
                                 JOptionPane.showMessageDialog(null, "Depósito exitoso de $" + monto);
-                                VentanPrincipal ventanPrincipal = new VentanPrincipal();
+                                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
                                 ventanPrincipal.setVisible(true);
                                 dispose();
                             } catch (NumberFormatException ex) {
                                 JOptionPane.showMessageDialog(null, "Ingrese un número válido", "Error", JOptionPane.ERROR_MESSAGE);
-                            } catch (Cajero.MultiploCincoException ex) {
+                            } catch (Cuentas.MultiploCincoException ex) {
                                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         }
@@ -150,7 +150,7 @@ public class VentanaIngreso extends JFrame {
         ActionListener accionVolver = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VentanPrincipal ventanPrincipal = new VentanPrincipal();
+                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
                 ventanPrincipal.setVisible(true);
                 dispose();
             }

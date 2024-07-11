@@ -1,6 +1,6 @@
 package Grafico;
 
-import Logica.Cajero;
+import Logica.Cuentas;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,19 +10,19 @@ import java.awt.event.ActionListener;
 public class VentanaConsulta extends JFrame {
     private JPanel panel;
     private JButton volver;
-    private Cajero cajero;
+    private Cuentas cuentas;
     private int pin;
 
-    public VentanaConsulta(int pin) {
+    public VentanaConsulta(int pin, Cuentas cuentas) {
         configurarVentana();
         this.pin = pin;
-        cajero = new Cajero();
+        this.cuentas = cuentas;
         iniciarComponentes();
     }
 
-    private void configurarVentana(){
-        setTitle("Consulta");
-        setSize(700,700);
+    public void configurarVentana(){
+        setTitle("Consulta de Saldo");
+        setSize(400,300);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -30,8 +30,8 @@ public class VentanaConsulta extends JFrame {
 
     private void iniciarComponentes(){
         crearPanel();
-        texto();
-        crearBotones();
+        crearTexto();
+        crearBotonVolver();
         accionarBotones();
     }
 
@@ -42,17 +42,17 @@ public class VentanaConsulta extends JFrame {
         this.getContentPane().add(panel);
     }
 
-    private void texto(){
+    private void crearTexto(){
         JLabel texto = new JLabel();
-        texto.setText("SU BALANCE TOTAL ES DE: $" + cajero.consultarSaldo());
-        texto.setBounds(100, 300, 300, 30);
+        texto.setText("Saldo disponible: $" + cuentas.consultarSaldo(pin));
+        texto.setBounds(50, 50, 300, 30);
         texto.setFont(new Font("Tahoma", Font.PLAIN, 20));
         panel.add(texto);
     }
 
-    private void crearBotones(){
+    private void crearBotonVolver(){
         volver = new JButton();
-        volver.setBounds(20, 20, 100, 30);
+        volver.setBounds(150, 150, 100, 30);
         volver.setText("VOLVER");
         panel.add(volver);
     }
@@ -61,7 +61,7 @@ public class VentanaConsulta extends JFrame {
         ActionListener accionVolver = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VentanPrincipal ventanPrincipal = new VentanPrincipal();
+                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
                 ventanPrincipal.setVisible(true);
                 dispose();
             }
@@ -69,4 +69,3 @@ public class VentanaConsulta extends JFrame {
         volver.addActionListener(accionVolver);
     }
 }
-
