@@ -1,60 +1,92 @@
 package Logica;
 
+
 public class Cuentas {
-    private double saldoAhorro;
-    private double saldoCorriente;
+    private int saldoAhorro;
+    private int saldoCorriente;
     private final int pinAhorro = 2024;
     private final int pinCorriente = 1123;
 
     public Cuentas() {
-        this.saldoAhorro = 0.0; // Saldo inicial en 0
-        this.saldoCorriente = 0.0; // Saldo inicial en 0
+        this.saldoAhorro = 0;
+        this.saldoCorriente = 0;
     }
 
-    public double consultarSaldo(int pin) {
-        if (pin == pinAhorro) {
-            return saldoAhorro;
-        } else if (pin == pinCorriente) {
-            return saldoCorriente;
-        } else {
-            throw new IllegalArgumentException("PIN incorrecto");
+    public boolean verificarPin(String tipoCuenta, int pin) {
+        if (tipoCuenta.equals("Ahorro")) {
+            return pin == pinAhorro;
+        } else if (tipoCuenta.equals("Corriente")) {
+            return pin == pinCorriente;
         }
+        return false;
     }
 
-    public void ingresar(double cantidad, int pin) throws MultiploCincoException {
-        if (cantidad % 5 != 0) {
+    public void ingresar(String tipoCuenta, int monto) throws MultiploCincoException, MenorACincoException, MaxRetiroIngresoException {
+        if (monto % 5 != 0) {
             throw new MultiploCincoException("El monto debe ser múltiplo de 5.");
+        } else if (monto < 5) {
+            throw new MenorACincoException("La mínima cantidad a depositar es de $5 por transacción.");
+        } else if (monto > 500) {
+            throw new MaxRetiroIngresoException("La máxima cantidad a depositar es de $500 por transacción.");
         }
-        if (pin == pinAhorro) {
-            saldoAhorro += cantidad;
-        } else if (pin == pinCorriente) {
-            saldoCorriente += cantidad;
-        } else {
-            throw new IllegalArgumentException("PIN incorrecto");
+
+        if (tipoCuenta.equals("Ahorro")) {
+            saldoAhorro += monto;
+        } else if (tipoCuenta.equals("Corriente")) {
+            saldoCorriente += monto;
         }
     }
 
-    public boolean retirar(double cantidad, int pin) {
-        if (pin == pinAhorro) {
-            if (saldoAhorro >= cantidad) {
-                saldoAhorro -= cantidad;
-                return true; // Retiro exitoso
-            } else {
-                return false; // Fondos insuficientes
+    public void retirar(String tipoCuenta, int monto) throws SaldoInsuficienteException, MultiploCincoException, MenorACincoException, MaxRetiroIngresoException {
+        if (monto % 5 != 0) {
+            throw new MultiploCincoException("El monto debe ser múltiplo de 5.");
+        } else if (monto < 5) {
+            throw new MenorACincoException("La mínima cantidad a retirar es de $5 por transacción.");
+        } else if (monto > 500) {
+            throw new MaxRetiroIngresoException("La máxima cantidad a retirar es de $500 por transacción.");
+        }
+
+        if (tipoCuenta.equals("Ahorro")) {
+            if (saldoAhorro < monto) {
+                throw new SaldoInsuficienteException("Saldo insuficiente en la cuenta de ahorro.");
             }
-        } else if (pin == pinCorriente) {
-            if (saldoCorriente >= cantidad) {
-                saldoCorriente -= cantidad;
-                return true; // Retiro exitoso
-            } else {
-                return false; // Fondos insuficientes
+            saldoAhorro -= monto;
+        } else if (tipoCuenta.equals("Corriente")) {
+            if (saldoCorriente < monto) {
+                throw new SaldoInsuficienteException("Saldo insuficiente en la cuenta corriente.");
             }
-        } else {
-            throw new IllegalArgumentException("PIN incorrecto");
+            saldoCorriente -= monto;
         }
     }
 
-    public class MultiploCincoException extends Exception {
+    public int getSaldo(String tipoCuenta) {
+        if (tipoCuenta.equals("Ahorro")) {
+            return saldoAhorro;
+        } else if (tipoCuenta.equals("Corriente")) {
+            return saldoCorriente;
+        }
+        return 0;
+    }
+
+    public static class MaxRetiroIngresoException extends Exception {
+        public MaxRetiroIngresoException(String message) {
+            super(message);
+        }
+    }
+
+    public static class MenorACincoException extends Exception {
+        public MenorACincoException(String message) {
+            super(message);
+        }
+    }
+
+    public static class SaldoInsuficienteException extends Exception {
+        public SaldoInsuficienteException(String message) {
+            super(message);
+        }
+    }
+
+    public static class MultiploCincoException extends Exception {
         public MultiploCincoException(String message) {
             super(message);
         }

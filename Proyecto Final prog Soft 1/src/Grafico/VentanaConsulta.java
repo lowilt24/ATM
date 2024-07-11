@@ -9,63 +9,58 @@ import java.awt.event.ActionListener;
 
 public class VentanaConsulta extends JFrame {
     private JPanel panel;
+    private JLabel saldoLabel;
     private JButton volver;
     private Cuentas cuentas;
-    private int pin;
+    private String tipoCuenta;
 
-    public VentanaConsulta(int pin, Cuentas cuentas) {
+    public VentanaConsulta(Cuentas cuentas, String tipoCuenta) {
         configurarVentana();
-        this.pin = pin;
         this.cuentas = cuentas;
+        this.tipoCuenta = tipoCuenta;
         iniciarComponentes();
     }
 
-    public void configurarVentana(){
+    public void configurarVentana() {
         setTitle("Consulta de Saldo");
-        setSize(400,300);
+        setSize(400, 200);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void iniciarComponentes(){
+    private void iniciarComponentes() {
         crearPanel();
-        crearTexto();
+        mostrarSaldo();
         crearBotonVolver();
-        accionarBotones();
     }
 
-    private void crearPanel(){
+    private void crearPanel() {
         panel = new JPanel();
         panel.setLayout(null);
         panel.setBackground(Color.GRAY);
         this.getContentPane().add(panel);
     }
 
-    private void crearTexto(){
-        JLabel texto = new JLabel();
-        texto.setText("Saldo disponible: $" + cuentas.consultarSaldo(pin));
-        texto.setBounds(50, 50, 300, 30);
-        texto.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        panel.add(texto);
+    private void mostrarSaldo() {
+        saldoLabel = new JLabel("Saldo: $" + cuentas.getSaldo(tipoCuenta));
+        saldoLabel.setBounds(50, 50, 300, 30);
+        saldoLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        panel.add(saldoLabel);
     }
 
-    private void crearBotonVolver(){
-        volver = new JButton();
-        volver.setBounds(150, 150, 100, 30);
-        volver.setText("VOLVER");
+    private void crearBotonVolver() {
+        volver = new JButton("VOLVER");
+        volver.setBounds(150, 100, 100, 40);
         panel.add(volver);
-    }
 
-    private void accionarBotones(){
-        ActionListener accionVolver = new ActionListener() {
+        volver.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
-                ventanPrincipal.setVisible(true);
+                VentanPrincipal ventanaPrincipal = new VentanPrincipal(cuentas, tipoCuenta);
+                ventanaPrincipal.setVisible(true);
                 dispose();
             }
-        };
-        volver.addActionListener(accionVolver);
+        });
     }
 }

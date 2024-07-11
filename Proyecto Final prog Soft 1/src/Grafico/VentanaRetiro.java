@@ -13,47 +13,45 @@ public class VentanaRetiro extends JFrame {
     private JButton[] botonesCantidades;
     private JTextField otroTextField;
     private Cuentas cuentas;
-    private int pin;
+    private String tipoCuenta;
 
-    public VentanaRetiro(int pin, Cuentas cuentas) {
+    public VentanaRetiro(Cuentas cuentas, String tipoCuenta) {
         configurarVentana();
-        this.pin = pin;
         this.cuentas = cuentas;
+        this.tipoCuenta = tipoCuenta;
         iniciarComponentes();
     }
 
-    public void configurarVentana(){
+    public void configurarVentana() {
         setTitle("Retiro");
-        setSize(700,700);
+        setSize(700, 700);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void iniciarComponentes(){
+    private void iniciarComponentes() {
         crearPanel();
         crearTexto();
         crearBotonesCant();
         crearBotonVolver();
-        accionarBotones();
     }
 
-    private void crearPanel(){
+    private void crearPanel() {
         panel = new JPanel();
         panel.setLayout(null);
         panel.setBackground(Color.GRAY);
         this.getContentPane().add(panel);
     }
 
-    private void crearTexto(){
-        JLabel texto = new JLabel();
-        texto.setText("Seleccione el valor a retirar");
-        texto.setBounds(150, 50, 300, 30);
-        texto.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    private void crearTexto() {
+        JLabel texto = new JLabel("Seleccione el valor a retirar");
+        texto.setBounds(200, 60, 300, 30);
+        texto.setFont(new Font("Tahoma", Font.BOLD, 20));
         panel.add(texto);
     }
 
-    private void crearBotonesCant(){
+    private void crearBotonesCant() {
         int[] cantidades = {5, 10, 20, 50, 100, 200};
         botonesCantidades = new JButton[cantidades.length];
 
@@ -75,13 +73,11 @@ public class VentanaRetiro extends JFrame {
                             "Confirmación de retiro",
                             JOptionPane.YES_NO_OPTION);
                     if (confirmacion == JOptionPane.YES_OPTION) {
-                        if (cuentas.retirar(monto, pin)) {
+                        try {
+                            cuentas.retirar(tipoCuenta, monto);
                             JOptionPane.showMessageDialog(null, "Retiro exitoso de $" + monto);
-                            VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
-                            ventanPrincipal.setVisible(true);
-                            dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Fondos insuficientes", "Error", JOptionPane.ERROR_MESSAGE);
+                        } catch (Cuentas.SaldoInsuficienteException | Cuentas.MultiploCincoException | Cuentas.MenorACincoException | Cuentas.MaxRetiroIngresoException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 }
@@ -112,44 +108,42 @@ public class VentanaRetiro extends JFrame {
                 confirmar.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        int monto = Integer.parseInt(otroTextField.getText());
-                        int confirmacion = JOptionPane.showConfirmDialog(null,
-                                "¿Está seguro que desea retirar $" + monto + " de su cuenta?",
-                                "Confirmación de retiro",
-                                JOptionPane.YES_NO_OPTION);
-                        if (confirmacion == JOptionPane.YES_OPTION) {
-                            if (cuentas.retirar(monto, pin)) {
+                        try {
+                            int monto = Integer.parseInt(otroTextField.getText());
+                            int confirmacion = JOptionPane.showConfirmDialog(null,
+                                    "¿Está seguro que desea retirar $" + monto + " de su cuenta?",
+                                    "Confirmación de retiro",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (confirmacion == JOptionPane.YES_OPTION) {
+                                cuentas.retirar(tipoCuenta, monto);
                                 JOptionPane.showMessageDialog(null, "Retiro exitoso de $" + monto);
-                                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
-                                ventanPrincipal.setVisible(true);
-                                dispose();
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Fondos insuficientes", "Error", JOptionPane.ERROR_MESSAGE);
                             }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(null, "Ingrese un monto válido", "Error", JOptionPane.ERROR_MESSAGE);
+                        } catch (Cuentas.SaldoInsuficienteException | Cuentas.MultiploCincoException | Cuentas.MenorACincoException | Cuentas.MaxRetiroIngresoException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 });
+
+                panel.revalidate();
+                panel.repaint();
             }
         });
     }
 
-    private void crearBotonVolver(){
-        // Botón "Volver"
-        volver = new JButton();
+    private void crearBotonVolver() {
+        volver = new JButton("VOLVER");
         volver.setBounds(20, 20, 100, 30);
-        volver.setText("VOLVER");
         panel.add(volver);
-    }
 
-    private void accionarBotones(){
-        ActionListener accionVolver = new ActionListener() {
+        volver.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VentanPrincipal ventanPrincipal = new VentanPrincipal(cuentas);
-                ventanPrincipal.setVisible(true);
+                VentanPrincipal ventanaPrincipal = new VentanPrincipal(cuentas, tipoCuenta);
+                ventanaPrincipal.setVisible(true);
                 dispose();
             }
-        };
-        volver.addActionListener(accionVolver);
+        });
     }
 }
